@@ -1,0 +1,22 @@
+{
+  "name": "starter-html",
+  "version": "1.0.0",
+  "description": "Starter HTML Gulp utility",
+  "main": "gulpfile.js",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-combine-mq": "^0.4.0",
+    "gulp-cssmin": "^0.1.7",
+    "gulp-notify": "^2.2.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^2.2.0",
+    "gulp-uglify": "^1.5.3",
+    "jshint": "^2.9.3",
+    "yargs": "^5.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "gioppy <tech@giovannibuffa.it>",
+  "license": "ISC"
+}
