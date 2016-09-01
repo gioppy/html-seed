@@ -1,2 +1,4 @@
-# html-seed
-Seed repository fro stater HTML/Template/Web project
+# HTML Seed
+Seed repository fro starter HTML/Template/Web project.
+
+## Instructions coming soon!
