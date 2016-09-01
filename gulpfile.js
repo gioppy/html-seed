@@ -127,8 +127,13 @@ gulp.task('styleguide:styles', () => {
 });
 
 gulp.task('styleguide:fonts', () => {
-  return gulp.src(['assets/fonts/*', '!assets/fonts/*.scss'])
+  return gulp.src(['assets/fonts/*', '!assets/fonts/*.scss', '!assets/fonts/*.md'])
     .pipe(gulp.dest('../patterns/source/fonts'));
+});
+
+gulp.task('styleguide:images', () => {
+  return gulp.src(['assets/images/**/*', '!assets/images/*.md'])
+    .pipe(gulp.dest('../patterns/source/images'));
 });
 
 gulp.task('watch', function(){
@@ -138,13 +143,24 @@ gulp.task('watch', function(){
   if(argv.s){
     gulp.watch(['assets/styles/*.css', '!assets/styles/*.min.css', '!assets/styles/*.tmp.css'], ['styleguide:styles']);
     gulp.watch(['assets/fonts/*', '!assets/fonts/*.scss'], ['styleguide:fonts']);
+    gulp.watch(['assets/images/**/*', '!assets/images/*.md'], ['styleguide:images']);
   }
 });
 
 gulp.task('default', (cb) => {
-  runSequece(
-    ['styles', 'fonts', 'scripts'],
-    'images',
-    cb
-  );
+  if(argv.s){
+      runSequece(
+        ['styles', 'fonts', 'scripts'],
+        'images',
+        ['styleguide:styles', 'styleguide:fonts'],
+        'styleguide:images',
+        cb
+      );
+    }else{
+      runSequece(
+        ['styles', 'fonts', 'scripts'],
+        'images',
+        cb
+      );
+    }
 })
