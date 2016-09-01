@@ -3,12 +3,25 @@ var sass = require('gulp-sass');
 var cmq = require('gulp-combine-mq');
 var rename = require('gulp-rename');
 var cssmin = require('gulp-cssmin');
+var postcss = require('gulp-postcss');
+var imageMin = require('gulp-imagemin');
+var autoprefixer = require('autoprefixer');
+var del = require('del');
 var uglify = require('gulp-uglify');
 var notify = require("gulp-notify");
 var argv = require("yargs").argv;
+var runSequece = require('run-sequence');
 var path = require("path");
 
 var opt = require("./config.json");
+
+gulp.task('images', function(){
+  return gulp.src(['assets/images/*', '!assets/images/*.md'])
+    .pipe(imageMin())
+    .pipe(gulp.dest((file) => {
+      return file.base;
+    }));
+});
 
 gulp.task('scripts', function(){
   return gulp.src(['assets/scripts/*.js', '!assets/scripts/*.min.js'])
@@ -83,7 +96,7 @@ gulp.task('sass', function(){
 });
 
 gulp.task('styles', ['combine'], function(){
-  return gulp.src('assets/styles/*.tmp.css')
+  var e = gulp.src('assets/styles/*.tmp.css')
     .pipe(cssmin({
       showLog:false
     }))
@@ -91,7 +104,12 @@ gulp.task('styles', ['combine'], function(){
       var name = path.basename;
       path.basename = name.replace('.tmp', '.min');
     }))
-    .pipe(gulp.dest('assets/styles'));
+    .pipe(postcss([ autoprefixer({ browsers: ['last 3 versions'] })]))
+    .pipe(gulp.dest((file) => {
+      return file.base;
+    }));
+  del(['assets/styles/*.tmp.css']);
+  return e;
 });
 
 gulp.task('combine', ['sass'], function() {
@@ -122,3 +140,11 @@ gulp.task('watch', function(){
     gulp.watch(['assets/fonts/*', '!assets/fonts/*.scss'], ['styleguide:fonts']);
   }
 });
+
+gulp.task('default', (cb) => {
+  runSequece(
+    ['styles', 'fonts', 'scripts'],
+    'images',
+    cb
+  );
+})
