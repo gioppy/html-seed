@@ -8,9 +8,11 @@ var imageMin = require('gulp-imagemin');
 var autoprefixer = require('autoprefixer');
 var del = require('del');
 var uglify = require('gulp-uglify');
+var sourcemaps = require('gulp-sourcemaps');
 var notify = require("gulp-notify");
 var argv = require("yargs").argv;
 var runSequece = require('run-sequence');
+var watch = require('gulp-watch');
 var path = require("path");
 
 var opt = require("./config.json");
@@ -47,11 +49,9 @@ gulp.task('scripts', function(){
       };
     }))
     .pipe(rename({suffix: '.min'}))
-    .pipe(gulp.dest('assets/scripts'))
-    .pipe(notify({
-      title: opt.title,
-      message: "Scripts Processed",
-      icon: path.join(__dirname, 'assets/images/icon.png')
+    .pipe(sourcemaps.write('./'))
+    .pipe(gulp.dest(function(file){
+      return file.base;
     }));
 });
 
@@ -96,7 +96,7 @@ gulp.task('sass', function(){
 });
 
 gulp.task('styles', ['combine'], function(){
-  var e = gulp.src('assets/styles/*.tmp.css')
+  return gulp.src('assets/styles/*.tmp.css')
     .pipe(cssmin({
       showLog:false
     }))
@@ -108,8 +108,6 @@ gulp.task('styles', ['combine'], function(){
     .pipe(gulp.dest((file) => {
       return file.base;
     }));
-  del(['assets/styles/*.tmp.css']);
-  return e;
 });
 
 gulp.task('combine', ['sass'], function() {
@@ -119,6 +117,10 @@ gulp.task('combine', ['sass'], function() {
     }))
     .pipe(rename({suffix: '.tmp'}))
     .pipe(gulp.dest('assets/styles'));
+});
+
+gulp.task('styles:remove:temp', ['styles'], function(){
+  del(['assets/styles/*.tmp.css']);
 });
 
 gulp.task('styleguide:styles', () => {
@@ -137,13 +139,31 @@ gulp.task('styleguide:images', () => {
 });
 
 gulp.task('watch', function(){
-  gulp.watch(['assets/scss/*.scss', 'assets/scss/**/*.scss'], ['styles']);
-  gulp.watch(['assets/fonts/*.scss'], ['fonts']);
-  gulp.watch(['assets/scripts/*.js', '!assets/scripts/*.min.js'], ['scripts']);
   if(argv.s){
-    gulp.watch(['assets/styles/*.css', '!assets/styles/*.min.css', '!assets/styles/*.tmp.css'], ['styleguide:styles']);
-    gulp.watch(['assets/fonts/*', '!assets/fonts/*.scss'], ['styleguide:fonts']);
-    gulp.watch(['assets/images/**/*', '!assets/images/*.md'], ['styleguide:images']);
+    return watch([
+      'assets/scss/*.scss',
+      'assets/scss/**/*.scss',
+      'assets/fonts/*.scss',
+      'assets/images/**/*',
+      '!assets/images/*.md'
+    ], function(){
+      runSequece(
+        ['styleguide:styles', 'styleguide:fonts', 'styleguide:images'],
+        'styles:remove:temp'
+      );
+    });
+  }else{
+    return watch([
+      'assets/scss/*.scss',
+      'assets/scss/**/*.scss',
+      'assets/fonts/*.scss',
+      'assets/scripts/*.js'
+    ], function(){
+      runSequece(
+        ['styles', 'fonts', 'scripts'],
+        'styles:remove:temp'
+      );
+    });
   }
 });
 
@@ -151,6 +171,7 @@ gulp.task('default', (cb) => {
   if(argv.s){
       runSequece(
         ['styles', 'fonts', 'scripts'],
+        'styles:remove:temp',
         'images',
         ['styleguide:styles', 'styleguide:fonts'],
         'styleguide:images',
@@ -159,6 +180,7 @@ gulp.task('default', (cb) => {
     }else{
       runSequece(
         ['styles', 'fonts', 'scripts'],
+        'styles:remove:temp',
         'images',
         cb
       );
