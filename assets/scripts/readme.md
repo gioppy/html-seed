@@ -1,1 +1,1 @@
-This directory is reserved for additional javascripts files.
+This directory is reserved for additional javascripts/typescript files.

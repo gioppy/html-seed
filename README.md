@@ -10,6 +10,11 @@ You must install two npm modules globally, `gulp` and `bower`:
   sudo npm install -g gulp bower
 ```
 Remeber to use `sudo` only if you are on UNIX system!
+### Step 2.1 install TypeScript
+If you want, you can use TypeScript instead of normal JavaScript. You just install TypeScript globally with:
+```
+  sudo npm install -g typescript
+```
 ### Step 3: install local dependencies
 Download this repository as package or cloning via git.
 After that, move to the folder via terminal:
@@ -81,7 +86,7 @@ If you are ready, you can run
 ```
 to generate and copy all the assets to _patterns_ folder.
 #### Step 4 - Pattern Lab: generate distribution
-Whean your are ready, you can distribute the pattern libraries via
+When your are ready, you can distribute the pattern libraries via
 ```
   gulp
 ```
