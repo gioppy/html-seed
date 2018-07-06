@@ -1,34 +1,34 @@
-var gulp = require('gulp');
-var sass = require('gulp-sass');
-var cmq = require('gulp-combine-mq');
-var rename = require('gulp-rename');
-var cssmin = require('gulp-cssmin');
-var postcss = require('gulp-postcss');
-var imageMin = require('gulp-imagemin');
-var autoprefixer = require('autoprefixer');
-var del = require('del');
-var ts = require('gulp-typescript');
-var uglify = require('gulp-uglify');
-var sourcemaps = require('gulp-sourcemaps');
-var notify = require("gulp-notify");
-var argv = require("yargs").argv;
-var runSequece = require('run-sequence');
-var watch = require('gulp-watch');
-var path = require("path");
+const gulp = require('gulp');
+const sass = require('gulp-sass');
+const cmq = require('gulp-combine-mq');
+const rename = require('gulp-rename');
+const cssmin = require('gulp-cssmin');
+const postcss = require('gulp-postcss');
+const imageMin = require('gulp-imagemin');
+const autoprefixer = require('autoprefixer');
+const del = require('del');
+const ts = require('gulp-typescript');
+const uglify = require('gulp-uglify');
+const sourcemaps = require('gulp-sourcemaps');
+const notify = require("gulp-notify");
+const argv = require("yargs").argv;
+const runSequece = require('run-sequence');
+const watch = require('gulp-watch');
+const path = require("path");
 
-var tsProject = ts.createProject("tsconfig.json");
+const tsProject = ts.createProject("tsconfig.json");
 
-var opt = require("./config.json");
+const opt = require("./config.json");
 
-gulp.task('images', function () {
-  return gulp.src(['assets/images/!*', '!assets/images/!*.md'])
+gulp.task('images', () => {
+  return gulp.src(['assets/images/*', '!assets/images/*.md'])
     .pipe(imageMin())
     .pipe(gulp.dest(function (file) {
       return file.base;
     }));
 });
 
-gulp.task('typescript', function () {
+gulp.task('typescript', () => {
   return tsProject.src()
     .pipe(tsProject())
     .pipe(gulp.dest(function(file){
@@ -36,7 +36,7 @@ gulp.task('typescript', function () {
     }));
 });
 
-gulp.task('scripts', ['typescript'], function(){
+gulp.task('scripts', ['typescript'], () => {
   return gulp.src(['assets/scripts/*.js', '!assets/scripts/*.min.js'])
     .pipe(uglify({
       mangle: true,
@@ -51,8 +51,8 @@ gulp.task('scripts', ['typescript'], function(){
       },
       preserveComments: function(){return false;}
     })).on('error', notify.onError(function(e) {
-      var fullPath = e.fileName;
-      var path = fullPath.replace(__dirname, '');
+      const fullPath = e.fileName;
+      const path = fullPath.replace(__dirname, '');
       return {
         title: path,
         message: e.message,
@@ -66,7 +66,7 @@ gulp.task('scripts', ['typescript'], function(){
     }));
 });
 
-gulp.task('fonts', function(){
+gulp.task('fonts', () => {
   return gulp.src('assets/fonts/fonts.scss')
     .pipe(sass({
       outputStyle: 'compressed'
@@ -81,7 +81,7 @@ gulp.task('fonts', function(){
     .pipe(gulp.dest('assets/fonts'));
 });
 
-gulp.task('sass', function(){
+gulp.task('sass', () => {
   return gulp.src(['assets/scss/*.scss', 'assets/scss/**/*.scss'])
     .pipe(sass({
       outputStyle: 'compact'
@@ -95,13 +95,13 @@ gulp.task('sass', function(){
     .pipe(gulp.dest('assets/styles'));
 });
 
-gulp.task('styles', ['combine'], function(){
+gulp.task('styles', ['combine'], () => {
   return gulp.src('assets/styles/*.tmp.css')
     .pipe(cssmin({
       showLog:false
     }))
     .pipe(rename(function(path){
-      var name = path.basename;
+      let name = path.basename;
       path.basename = name.replace('.tmp', '.min');
     }))
     .pipe(postcss([ autoprefixer({ browsers: ['last 3 versions'] })]))
@@ -110,7 +110,7 @@ gulp.task('styles', ['combine'], function(){
     }));
 });
 
-gulp.task('combine', ['sass'], function() {
+gulp.task('combine', ['sass'], () => {
   return gulp.src(['assets/styles/*.css', '!assets/styles/*.tmp.css', '!assets/styles/*.min.css'])
     .pipe(cmq({
       beautify: false
